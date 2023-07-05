@@ -1,15 +1,17 @@
 import { db } from "../app.js";
+import bcrypt from "bcrypt";
 
 const userController = {
   signUp: async (req, res) => {
     try {
       const { name, email, password } = req.body;
       const User = db.collection("users");
+      const hash = bcrypt.hashSync(password, 10);
 
       const newUser = {
         name,
         email,
-        password,
+        password: hash,
       };
 
       const existingUser = await User.findOne({ email });
@@ -42,8 +44,8 @@ const userController = {
       if (!user) {
         return res.status(400).json({ error: "Usuário não cadastrado" });
       }
-
-      if (user.password !== password) {
+      const checkPassword = bcrypt.compareSync(password, user.password);
+      if (!checkPassword) {
         return res.status(400).json({ error: "Senha incorreta" });
       }
 
