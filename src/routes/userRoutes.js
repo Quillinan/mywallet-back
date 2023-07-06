@@ -1,13 +1,12 @@
 import express from "express";
 import userController from "../controllers/User.Controller.js";
-// import auth from "../middlewares/AuthMiddleware.js";
 
-const router = express.Router();
+const userRoutes = express.Router();
 
 // Rota de cadastro (signup)
-router.post("/signup", (req, res) => userController.signUp(req, res));
+userRoutes.post("/signup", userController.signUp);
 
 // Rota de login (signin)
-router.post("/signin", (req, res) => userController.signIn(req, res));
+userRoutes.post("/signin", userController.signIn);
 
-export default router;
+export default userRoutes;

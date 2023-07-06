@@ -3,7 +3,8 @@ import cors from "cors";
 import { MongoClient } from "mongodb";
 import "dotenv/config";
 import bodyParser from "body-parser";
-import router from "./routes/userRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import transactionRoutes from "./routes/transactionRoutes.js";
 
 // Criação do app
 const app = express();
@@ -28,7 +29,8 @@ const db = mongoClient.db();
 
 app.use(bodyParser.json());
 
-app.use("/users", router);
+app.use("/users", userRoutes);
+app.use("/transactions", transactionRoutes);
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
