@@ -28,10 +28,12 @@ const userController = {
         return res.status(409).json({ error: "Email já utilizado!" });
       }
 
+      const hashedPassword = bcrypt.hashSync(password, 10);
+
       const newUser = {
         name,
         email,
-        password,
+        password: hashedPassword,
       };
 
       await User.insertOne(newUser);
