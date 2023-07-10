@@ -1,7 +1,10 @@
-function auth(req, res, next) {
-  // Lógica de autenticação
-  console.log("Autenticado");
-  next();
-}
+const verifyToken = (req, res, next) => {
+  const token = req.headers.token;
+  if (!token || token == "") {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-module.exports = auth;
+  next();
+};
+
+export default verifyToken;

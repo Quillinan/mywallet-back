@@ -1,25 +1,17 @@
 import { db } from "../app.js";
 import bcrypt from "bcrypt";
-import Joi from "joi";
 import { v4 as uuid } from "uuid";
+import { signInSchema, signUpSchema } from "../schemas/schemaUser.js";
 
 const userController = {
   signUp: async (req, res) => {
     try {
       const { name, email, password } = req.body;
 
-      const schema = Joi.object({
-        name: Joi.string().required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(3).required(),
-      });
+      const { error } = signUpSchema.validate(req.body);
 
-      const validationResult = schema.validate(req.body);
-
-      if (validationResult.error) {
-        return res
-          .status(422)
-          .json({ error: validationResult.error.details[0].message });
+      if (error) {
+        return res.status(422).json({ error: error.details[0].message });
       }
 
       const User = db.collection("users");
@@ -49,34 +41,18 @@ const userController = {
       const User = db.collection("users");
 
       let user;
-      if (email) {
-        const schema = Joi.object({
-          email: Joi.string().email().required(),
-          password: Joi.string().required(),
-        });
+      if (email || name) {
+        const { error } = signInSchema.validate({ email, name, password });
 
-        const validationResult = schema.validate({ email, password });
-
-        if (validationResult.error) {
-          return res
-            .status(422)
-            .json({ error: validationResult.error.details[0].message });
+        if (error) {
+          return res.status(422).json({ error: error.details[0].message });
         }
-        user = await User.findOne({ email });
-      } else if (name) {
-        const schema = Joi.object({
-          name: Joi.string().required(),
-          password: Joi.string().required(),
-        });
 
-        const validationResult = schema.validate({ name, password });
-
-        if (validationResult.error) {
-          return res
-            .status(422)
-            .json({ error: validationResult.error.details[0].message });
+        if (email) {
+          user = await User.findOne({ email });
+        } else {
+          user = await User.findOne({ name });
         }
-        user = await User.findOne({ name });
       }
 
       if (!user) {

@@ -5,6 +5,6 @@ import transactionRoutes from "./transactionRoutes.js";
 const router = express.Router();
 
 router.use("/users", userRoutes);
-router.use("/transactions", transactionRoutes);
+router.use("/transaction", transactionRoutes);
 
 export default router;
