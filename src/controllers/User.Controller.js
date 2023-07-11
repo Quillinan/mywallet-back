@@ -75,6 +75,7 @@ const userController = {
         const session = {
           token,
           email: user.email,
+          name: user.name,
         };
         await Session.insertOne(session);
       }
@@ -95,8 +96,21 @@ const userController = {
     } catch (error) {
       res.status(401).json({ error: error.message });
     }
-  }
-  ,
+  },
+  getSessionbyToken: async (req, res) => {
+    try {
+      const token = req.headers.token;
+  
+      const sessions = db.collection("sessions");
+      const session = await sessions.findOne({ token });
+      const name = session.name;
+
+  
+      res.status(200).json({ name });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };
 
 export default userController;

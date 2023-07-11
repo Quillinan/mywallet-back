@@ -13,5 +13,8 @@ userRoutes.post("/signin", userController.signIn);
 // Rota de logout
 userRoutes.post("/logout",verifyToken, userController.logout);
 
+// Rota de atualização de usuário
+userRoutes.get("/username", verifyToken, userController.getSessionbyToken);
+
 export default userRoutes;
 

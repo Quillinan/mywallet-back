@@ -30,7 +30,8 @@ const transactionController = {
         date: formattedDate,
         value,
         description,
-        email: req.user.email
+        email: req.user.email,
+        name: req.user.name
       };
   
       const transactionsCollection = db.collection("transactions");

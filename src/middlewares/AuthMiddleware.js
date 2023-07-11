@@ -17,6 +17,7 @@ const verifyToken = async (req, res, next) => {
 
     req.user = {
       email: session.email,
+      name: session.name,
     };
 
     next();
