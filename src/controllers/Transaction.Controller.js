@@ -5,37 +5,50 @@ const transactionController = {
   addTransaction: async (req, res) => {
     try {
       const type = req.params.tipo;
-
+  
       if (type !== "entrada" && type !== "saida") {
         return res.status(422).json({ error: "Tipo de transação inválido" });
       }
-
+  
       const validationResult = transactionSchema.validate(req.body);
-
+  
       if (validationResult.error) {
         return res
           .status(422)
           .json({ error: validationResult.error.details[0].message });
       }
-
+  
       const { value, description } = req.body;
-
+  
       const date = new Date();
       const day = date.getDate();
       const month = date.getMonth() + 1;
       const formattedDate = `${day}/${month}`;
-
+  
       const newTransaction = {
         type,
         date: formattedDate,
         value,
         description,
+        email: req.user.email
       };
-
+  
       const transactionsCollection = db.collection("transactions");
       await transactionsCollection.insertOne(newTransaction);
-
+  
       res.status(200).json({ message: "Transação adicionada com sucesso" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+  getTransaction: async (req, res) => {
+    try {
+      const email = req.user.email;
+  
+      const transactionsCollection = db.collection("transactions");
+      const transactions = await transactionsCollection.find({ email }).toArray();
+  
+      res.status(200).json({ transactions });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

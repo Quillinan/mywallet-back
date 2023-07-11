@@ -37,38 +37,66 @@ const userController = {
   signIn: async (req, res) => {
     try {
       const { email, name, password } = req.body;
-
+  
       const User = db.collection("users");
-
+      const Session = db.collection("sessions");
+  
       let user;
       if (email || name) {
         const { error } = signInSchema.validate({ email, name, password });
-
+  
         if (error) {
           return res.status(422).json({ error: error.details[0].message });
         }
-
+  
         if (email) {
           user = await User.findOne({ email });
         } else {
           user = await User.findOne({ name });
         }
       }
-
+  
       if (!user) {
         return res.status(404).json({ error: "Usuário não cadastrado" });
       }
-
+  
       const checkPassword = bcrypt.compareSync(password, user.password);
       if (!checkPassword) {
         return res.status(401).json({ error: "Senha incorreta" });
       }
-
-      res.status(200).json({ message: "Usuário logado", token: uuid() });
+  
+      const existingSession = await Session.findOne({ email: user.email });
+  
+      const token = uuid();
+  
+      if (existingSession) {
+        await Session.updateOne({ email: user.email }, { $set: { token } });
+      } else {
+        const session = {
+          token,
+          email: user.email,
+        };
+        await Session.insertOne(session);
+      }
+  
+      res.status(200).json({ message: "Usuário logado", token });
     } catch (error) {
       res.status(401).json({ error: error.message });
     }
   },
+  logout: async (req, res) => {
+    try {
+      const { email } = req.user;
+  
+      const Session = db.collection("sessions");
+      await Session.updateOne({ email }, { $set: { token: "" } });
+  
+      res.status(200).json({ message: "Usuário deslogado" });
+    } catch (error) {
+      res.status(401).json({ error: error.message });
+    }
+  }
+  ,
 };
 
 export default userController;
