@@ -15,7 +15,7 @@ app.use(express.json());
 const port = process.env.PORT || 5000;
 
 // Conexão com o Banco
-const mongoClient = new MongoClient(process.env.DB_URL);
+const mongoClient = new MongoClient(process.env.DATABASE_URL);
 
 try {
   await mongoClient.connect(); // top level await
